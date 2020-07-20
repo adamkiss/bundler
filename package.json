@@ -1,6 +1,6 @@
 {
   "name": "@adamkiss/bundler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Packaged version of Parcel JS, tailored to my usecases.",
   "bin": {
     "bundler": "bundler.js"

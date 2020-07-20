@@ -73,7 +73,6 @@ const manifest = async (mode, bundle) => {
 		mode.manifestTemplate(getBundleFiles(bundle))
 	)
 	const outFile = path.join(mode.outDir, path.basename(mode.entryFile))
-	console.log(outFile)
 	if (fs.existsSync(outFile)) {
 		await deleteFile(outFile)
 	}
@@ -86,10 +85,11 @@ const manifest = async (mode, bundle) => {
 	deleteAllFilesIn(mode.outDir)
 
 	const bundler = new Parcel(entryFile,bundlerOpts)
-	const bundle = await bundler.bundle()
 	bundler.on('bundled', async bundle => {
 		await manifest(mode, bundle)
 	})
+
+	const bundle = await bundler.bundle()
 
 	if (!opts.watch) {
 		await bundler.stop()
