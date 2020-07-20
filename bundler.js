@@ -11,7 +11,7 @@ const readDir = util.promisify(fs.readdir)
 
 const modes = {
 	kirby: require('./mode/kirby'),
-	// eleventy: require('./mode/eleventy')
+	eleventy: require('./mode/eleventy')
 }
 
 const args = require('minimist')(process.argv.slice(2), {
@@ -62,6 +62,9 @@ const getBundleFiles = bundle => {
 }
 
 const deleteAllFilesIn = async dir => {
+	if (!fs.existsSync(dir))
+		return
+
 	;(await readDir(dir)).forEach(async file => {
 		await deleteFile(path.join(dir, file))
 	})

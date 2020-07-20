@@ -12,7 +12,8 @@ const manifestTemplate = files => `<?php
 if (! function_exists('bundle')) {
 	function bundle($key = '') {
 		$manifest = [
-			${Object.keys(files).map(k => `'${k}' => [
+			${Object.keys(files).map(k => `'${k}' => (object)[
+				'name' => '${k}',
 				'type' => '${files[k].type}',
 				'url' => '${files[k].url}'
 			]`).join(`,
