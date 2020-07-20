@@ -13,6 +13,7 @@
   "author": "Adam Kiss",
   "license": "ISC",
   "dependencies": {
+    "browser-sync": "^2.26.10",
     "minimist": "^1.2.5",
     "parcel-bundler": "^1.12.4"
   }

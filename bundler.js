@@ -4,6 +4,7 @@ const path = require('path')
 const fs = require('fs')
 const util = require('util')
 const Parcel = require('parcel-bundler')
+const BrowserSync = require('browser-sync').create()
 
 const writeFile = util.promisify(fs.writeFile)
 const deleteFile = util.promisify(fs.unlink)
@@ -13,6 +14,8 @@ const modes = {
 	kirby: require('./mode/kirby'),
 	eleventy: require('./mode/eleventy')
 }
+
+const pkg = require(path.join(process.cwd(), 'package.json'))
 
 const args = require('minimist')(process.argv.slice(2), {
 	default: {
@@ -37,6 +40,9 @@ const bundlerOpts = Object.assign({
 }, {
 	outDir: mode.outDir
 }, mode.bundlerOpts)
+const bsOptions = {
+	...mode.bs, proxy: pkg.config.host || false
+}
 
 /*
 	LIB
@@ -97,8 +103,15 @@ const manifest = async (mode, bundle) => {
 	if (!opts.watch) {
 		await bundler.stop()
 	} else {
+		if (bsOptions.proxy) {
+			BrowserSync.init(bsOptions)
+		}
+
 		process.on('SIGINT', async () => {
 			await bundler.stop()
+			if (BrowserSync.active){
+				BrowserSync.exit()
+			}
 		})
 	}
 })()

@@ -38,5 +38,30 @@ module.exports = {
 	 * Manifest related options
 	 */
 	manifestPath: 'site/snippets/_bundler.php',
-	manifestTemplate
+	manifestTemplate,
+
+	/**
+	 * BrowserSync
+	 */
+	bs: {
+		ghostMode: {
+			clicks: true,
+			scroll: true,
+			location: true,
+			forms: false
+		},
+
+		server: false,
+
+		files: [
+			'site/collections/**',
+			'site/controllers/**',
+			'site/models/**',
+			'site/snippets/**',
+			'site/templates/**',
+		],
+		watchOptions: {
+			ignireInitial: true
+		}
+	}
 }
