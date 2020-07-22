@@ -30,7 +30,7 @@ const opts = {
 	config
 }
 const parcelOpts = Object.assign({
-	autoInstall: false,
+	logLevel: opts.production ? 4 : 3,
 	scopeHoist: opts.scopeHoist,
 	contentHash: opts.production,
 	sourceMaps: !opts.production
