@@ -6,8 +6,9 @@
     "bundler": "bundler.js"
   },
   "files": [
-    "bundler.js",
-    "mode"
+	"bundler.js",
+	"utils.js",
+    "default-kirby-config.js"
   ],
   "scripts": {},
   "author": "Adam Kiss",

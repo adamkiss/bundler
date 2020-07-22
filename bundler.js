@@ -2,86 +2,49 @@
 
 const path = require('path')
 const fs = require('fs')
-const util = require('util')
 const Parcel = require('parcel-bundler')
 const BrowserSync = require('browser-sync').create()
+const {
+	writeFile, deleteFile, readDir, deleteAllFilesIn,
+	findProjectRoot,
+	getBundleFiles,
+	createEntryFile, deleteEntryFile
+} = require('./utils.js')
 
-const writeFile = util.promisify(fs.writeFile)
-const deleteFile = util.promisify(fs.unlink)
-const readDir = util.promisify(fs.readdir)
-
-const modes = {
-	kirby: require('./mode/kirby'),
-	eleventy: require('./mode/eleventy')
+// Find bundler.config.js, or expect Kirby setup and set it up
+const configFile = path.join(findProjectRoot(), 'bundler.config.js')
+if (!fs.existsSync(configFile)) {
+	fs.writeFileSync(configFile, fs.readFileSync(path.join(__dirname, 'default-kirby-config.js')))
 }
-
-const pkg = require(path.join(process.cwd(), 'package.json'))
+const config = require(configFile)
 
 const args = require('minimist')(process.argv.slice(2), {
 	default: {
-		watch: false,
-		mode: 'eleventy'
+		watch: true
 	}
 })
+
 const opts = {
 	production: process.env.NODE_ENV === 'production',
 	watch: args.watch && process.env.NODE_ENV !== 'production',
-	mode: args.m || args.mode,
-	scopeHoist: ('--no-hoist' in args) ? false : true
+	config
 }
-
-const mode = modes[opts.mode]
-const entryFile = mode.entryFile
-const bundlerOpts = Object.assign({
+const parcelOpts = Object.assign({
 	autoInstall: false,
 	scopeHoist: opts.scopeHoist,
 	contentHash: opts.production,
 	sourceMaps: !opts.production
-}, {
-	outDir: mode.outDir
-}, mode.bundlerOpts)
-const bsOptions = {
-	...mode.bs, proxy: pkg.config.host || false
-}
+}, config.parcelOpts)
 
 /*
-	LIB
+	THE MAIN POINT
 */
-const getBundleFiles = bundle => {
-	const bundleFiles = {}
-	// Set.forEach has weird callback
-	// "value, key, Set", but key is… the same as value?
-	bundle.childBundles.forEach(child => {
-		bundleFiles[child.entryAsset.relativeName] = {
-			type: child.type,
-			dist: path.join(
-				mode.outDir,
-				path.basename(child.name)
-			),
-			url: path.join(
-				mode.bundlerOpts.publicUrl,
-				path.basename(child.name)
-			)
-		}
-	})
-	return bundleFiles
-}
-
-const deleteAllFilesIn = async dir => {
-	if (!fs.existsSync(dir))
-		return
-
-	;(await readDir(dir)).forEach(async file => {
-		await deleteFile(path.join(dir, file))
-	})
-}
-
-const manifest = async (mode, bundle) => {
+const writeManifest = async (config, bundle) => {
 	await writeFile(
-		mode.manifestPath,
-		mode.manifestTemplate(getBundleFiles(bundle))
+		config.manifestPath,
+		config.manifestTemplate(getBundleFiles(config, bundle))
 	)
-	const outFile = path.join(mode.outDir, path.basename(mode.entryFile))
+	const outFile = path.join(config.parcelOpts.outDir, path.basename(config.entryFile))
 	if (fs.existsSync(outFile)) {
 		await deleteFile(outFile)
 	}
@@ -91,24 +54,27 @@ const manifest = async (mode, bundle) => {
 	RUN
 */
 ;(async function () {
-	deleteAllFilesIn(mode.outDir)
+	deleteAllFilesIn(parcelOpts.outDir)
+	await createEntryFile(config)
 
-	const bundler = new Parcel(entryFile,bundlerOpts)
+	const bundler = new Parcel(config.entryFile, parcelOpts)
 	bundler.on('bundled', async bundle => {
-		await manifest(mode, bundle)
+		await writeManifest(config, bundle)
 	})
 
-	const bundle = await bundler.bundle()
+	await bundler.bundle()
 
 	if (!opts.watch) {
 		await bundler.stop()
+		// await deleteEntryFile(config)
 	} else {
-		if (bsOptions.proxy) {
-			BrowserSync.init(bsOptions)
+		if (config.bs && config.bs.proxy) {
+			BrowserSync.init(config.bs)
 		}
 
 		process.on('SIGINT', async () => {
 			await bundler.stop()
+			await deleteEntryFile(config)
 			if (BrowserSync.active){
 				BrowserSync.exit()
 			}
