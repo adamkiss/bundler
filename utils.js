@@ -5,14 +5,16 @@ const writeFile = util.promisify(fs.writeFile)
 const deleteFile = util.promisify(fs.unlink)
 const readDir = util.promisify(fs.readdir)
 
-// @note This is for now. I usually run assets from project root
-//       If it later bites me in the ass, I'll have this prepared
+/*
+@note This is for now. I usually run assets from project root
+      If it later bites me in the ass, I'll have this prepared
+*/
 const findProjectRoot = () => process.cwd()
 
 const getBundleFiles = (config, bundle) => {
 	const bundleFiles = {}
-	// Set.forEach has weird callback
-	// "value, key, Set", but key is… the same as value?
+	/* Set.forEach has weird callback
+		"value, key, Set", but key is… the same as value? */
 	bundle.childBundles.forEach(child => {
 		bundleFiles[child.entryAsset.relativeName] = {
 			type: child.type,

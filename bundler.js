@@ -11,7 +11,7 @@ const {
 	createEntryFile, deleteEntryFile
 } = require('./utils.js')
 
-// Find bundler.config.js, or expect Kirby setup and set it up
+/* Find bundler.config.js, or expect Kirby setup and set it up */
 const configFile = path.join(findProjectRoot(), 'bundler.config.js')
 if (!fs.existsSync(configFile)) {
 	fs.writeFileSync(configFile, fs.readFileSync(path.join(__dirname, 'default-kirby-config.js')))
@@ -66,7 +66,7 @@ const writeManifest = async (config, bundle) => {
 
 	if (!opts.watch) {
 		await bundler.stop()
-		// await deleteEntryFile(config)
+		await deleteEntryFile(config)
 	} else {
 		if (config.bs && config.bs.proxy) {
 			BrowserSync.init(config.bs)
