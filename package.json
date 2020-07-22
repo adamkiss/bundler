@@ -1,13 +1,13 @@
 {
   "name": "@adamkiss/bundler",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Packaged version of Parcel JS, tailored to my usecases.",
   "bin": {
     "bundler": "bundler.js"
   },
   "files": [
-	"bundler.js",
-	"utils.js",
+    "bundler.js",
+    "utils.js",
     "default-kirby-config.js"
   ],
   "scripts": {},
