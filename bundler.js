@@ -4,12 +4,16 @@ const path = require('path')
 const fs = require('fs')
 const Parcel = require('parcel-bundler')
 const BrowserSync = require('browser-sync').create()
+const stringify = require('stringify-object')
 const {
 	writeFile, deleteFile, readDir, deleteAllFilesIn,
 	findProjectRoot,
-	getBundleFiles,
-	createEntryFile, deleteEntryFile
+	// getBundleFiles,
+	// createEntryFile, deleteEntryFile
 } = require('./utils.js')
+const {
+	generateManifest
+} = require('./manifest.js')
 
 /* Find bundler.config.js, or expect Kirby setup and set it up */
 const configFile = path.join(findProjectRoot(), 'bundler.config.js')
@@ -37,40 +41,32 @@ const parcelOpts = Object.assign({
 }, config.parcelOpts)
 
 /*
-	THE MAIN POINT
-*/
-const writeManifest = async (config, bundle) => {
-	await writeFile(
-		config.manifestPath,
-		config.manifestTemplate(getBundleFiles(config, bundle))
-	)
-	const outFile = path.join(config.parcelOpts.outDir, path.basename(config.entryFile))
-	if (fs.existsSync(outFile)) {
-		await deleteFile(outFile)
-	}
-}
-
-/*
 	RUN
 */
 ;(async function () {
-	deleteAllFilesIn(parcelOpts.outDir)
-	await createEntryFile(config)
+	// deleteAllFilesIn(parcelOpts.outDir)
+	// await createEntryFile(config)
 
-	const bundler = new Parcel(config.entryFile, parcelOpts)
+	const bundler = new Parcel(config.files, parcelOpts)
 	bundler.on('bundled', async bundle => {
-		await writeManifest(config, bundle)
+		console.log(bundle)
+		await writeFile('inspect.json', stringify(bundle))
+		console.log(generateManifest(bundle, config))
 	})
 
 	await bundler.bundle()
 
 	if (!opts.watch) {
 		await bundler.stop()
-		await deleteEntryFile(config)
+		// await deleteEntryFile(config)
 	} else {
 		if (config.bs && config.bs.proxy) {
 			BrowserSync.init(config.bs)
 		}
+
+		process.on('beforeExit', code => {
+			console.log('beforeExit: ', code)
+		})
 
 		process.on('SIGINT', async () => {
 			await bundler.stop()
