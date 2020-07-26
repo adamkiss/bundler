@@ -1,3 +1,5 @@
+const pkg = require('package.json')
+
 module.exports = {
 	/*
 	 * Which files do actually get processed?
@@ -43,7 +45,7 @@ module.exports = {
 	 * BrowserSync
 	 */
 	bs: {
-		proxy: false,
+		proxy: pkg.config.host,
 		server: false,
 
 		files: [
