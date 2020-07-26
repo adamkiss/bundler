@@ -3,14 +3,9 @@
   "version": "5.0.2",
   "description": "Packaged version of Parcel JS, tailored to my usecases.",
   "bin": {
-    "bundler": "bundler.js"
+    "bundler": "src/bundler.js"
   },
-  "files": [
-    "bundler.js",
-    "manifest.js",
-    "utils.js",
-    "default-kirby-config.js"
-  ],
+  "files": ["src/"],
   "scripts": {},
   "author": "Adam Kiss",
   "license": "ISC",
