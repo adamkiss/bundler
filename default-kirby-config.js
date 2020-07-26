@@ -9,7 +9,6 @@ module.exports = {
 	/**
 	 * Parcel/cleanup related options
 	 */
-	entryFile: 'assets/assets.html',
 	parcelOpts: {
 		outDir: 'public/assets/dist',
 		publicUrl: '/assets/dist'
@@ -28,7 +27,8 @@ module.exports = {
 			function bundle($key = '') {
 				$manifest = [
 					${Object.keys(files).map(k => `'${k}' => (object)[
-						'name' => '${k}',
+						'name' => '${files[k].hash.name}',
+						'path' => '${files[k].hash.relative}',
 						'type' => '${files[k].type}',
 						'url' => '${files[k].url}'
 					]`).join(`,

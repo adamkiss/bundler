@@ -1,5 +1,4 @@
 const path = require('path')
-const {writeFile} = require('./utils')
 
 const getAssets = bundle => {
 	/*
@@ -8,39 +7,45 @@ const getAssets = bundle => {
 		and now I'm like 99% sure 'bundleFiles' is set of real bundles
 	*/
 	return (bundle.type ? [bundle] : Array.from(bundle.childBundles)).map(bundle => Object.assign({
-		parcelname: path.basename(bundle.name),
-		parcelpath: bundle.name,
-		path: path.dirname(bundle.name)
+		distname: path.basename(bundle.name),
+		distpath: bundle.name,
+		fullpath: path.dirname(bundle.name)
 	}, bundle.entryAsset))
 }
 
 const getHashName = asset => {
-	const parts = asset.parcelname
-		.split('.')
+	const parts = asset.distname.split('.')
 	const ext = parts.pop()
 	return [...parts, asset.hash.slice(0, 10), ext].join('.')
 }
 
 const createManifestObjects = (assets, config) => assets.map(asset => {
+	/*
+		This function isn't the nicest, I know. whatever.
+	*/
 	hashname = getHashName(asset)
 	return {
 		type: asset.type,
 		name: asset.relativeName,
+		original: path.relative(config.root, asset.name),
 		url: path.join(config.parcelOpts.publicUrl, hashname),
-		dist: hashname,
-		distabs: path.join(asset.path, hashname),
-		distrel: path.join(config.parcelOpts.outDir, hashname),
-		parcelname: asset.parcelname,
-		parcelabs: asset.parcelpath
+		hash: {
+			name: hashname,
+			relative: path.join(config.parcelOpts.outDir, hashname),
+			full: path.join(asset.fullpath, hashname)
+		},
+		dist: {
+			name: asset.distname,
+			full: asset.distpath
+		}
 	}
 })
 
 const generateManifest = (bundle, config) => {
 	const manifest = {}
-	createManifestObjects(getAssets(bundle), config)
-		.map(asset => {
-			manifest[asset.name] = asset
-		})
+	const assets = createManifestObjects(getAssets(bundle), config)
+
+	assets.forEach(asset => { manifest[asset.name] = asset })
 
 	return manifest
 }
