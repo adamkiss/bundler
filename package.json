@@ -1,12 +1,13 @@
 {
   "name": "@adamkiss/bundler",
-  "version": "4.0.2",
+  "version": "5.0.2",
   "description": "Packaged version of Parcel JS, tailored to my usecases.",
   "bin": {
     "bundler": "bundler.js"
   },
   "files": [
     "bundler.js",
+    "manifest.js",
     "utils.js",
     "default-kirby-config.js"
   ],
@@ -15,7 +16,9 @@
   "license": "ISC",
   "dependencies": {
     "browser-sync": "^2.26.10",
+    "del": "^5.1.0",
     "minimist": "^1.2.5",
     "parcel-bundler": "^1.12.4"
-  }
+  },
+  "devDependencies": {}
 }

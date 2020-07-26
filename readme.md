@@ -27,4 +27,8 @@ In package.json:
 
 @todo: describe :D
 
+## Gotchas I might forget
+
+### Parcel
+
 2020 Adam.
