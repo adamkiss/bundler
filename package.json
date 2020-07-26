@@ -1,11 +1,13 @@
 {
   "name": "@adamkiss/bundler",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Packaged version of Parcel JS, tailored to my usecases.",
   "bin": {
     "bundler": "src/bundler.js"
   },
-  "files": ["src/"],
+  "files": [
+    "src/"
+  ],
   "scripts": {},
   "author": "Adam Kiss",
   "license": "ISC",
